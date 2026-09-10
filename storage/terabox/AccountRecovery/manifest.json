@@ -1,0 +1,5 @@
+{
+  "root": "/AccountRecovery",
+  "folders": ["project", "evidence", "results", "backup", "sync"],
+  "policy": "official-api-only"
+}
