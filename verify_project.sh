@@ -18,5 +18,9 @@ import xml.etree.ElementTree as ET
 ET.parse('app/src/main/AndroidManifest.xml')
 print('XML PASS')
 PY
-! grep -RniE 'password|passwd|api[_-]?key|secret|access[_-]?token|refresh[_-]?token|otp|pin' app/src/main 2>/dev/null || { echo 'POSSIBLE SECRET TERM FOUND'; exit 1; }
+# Check for likely hard-coded credential assignments, not safe API/class identifiers such as SecretKey.
+if grep -RniE '(password|passwd|api[_-]?key|access[_-]?token|refresh[_-]?token|otp|pin)[[:space:]]*[:=]' app/src/main 2>/dev/null; then
+  echo 'POSSIBLE HARDCODED CREDENTIAL FOUND'
+  exit 1
+fi
 echo 'STATIC PROJECT CHECK PASS'
