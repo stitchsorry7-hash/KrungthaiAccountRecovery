@@ -10,12 +10,20 @@ class AccountNumberDetector {
         val normalized = normalizeThaiDigits(text)
         return regex.findAll(normalized).map { m ->
             val number = m.value.filter(Char::isDigit)
-            val start = maxOf(0, m.range.first - 90); val end = minOf(normalized.length, m.range.last + 91)
+            val start = maxOf(0, m.range.first - 90)
+            val end = minOf(normalized.length, m.range.last + 91)
             val ctx = normalized.substring(start, end).replace("\\n".toRegex(), " ").trim()
+            val before = normalized.substring(start, m.range.first).takeLast(40)
+
             var score = 40
-            if (ktb.any { ctx.contains(it, ignoreCase = true) }) score += 30
-            if (account.any { ctx.contains(it, ignoreCase = true) }) score += 25
-            if (bad.any { ctx.contains(it, ignoreCase = true) }) score -= 25
+            if (ktb.any { ctx.contains(it, ignoreCase = true) }) score += 20
+            if (account.any { ctx.contains(it, ignoreCase = true) }) score += 15
+
+            // Prefer an account number when the account label is immediately before it.
+            if (account.any { before.contains(it, ignoreCase = true) }) score += 25
+            // Strongly penalize numbers immediately associated with phone/contact labels.
+            if (bad.any { before.takeLast(20).contains(it, ignoreCase = true) }) score -= 60
+
             AccountCandidate(number, score.coerceIn(0, 100), ctx, source)
         }.distinctBy { it.number }.sortedByDescending { it.score }.toList()
     }
