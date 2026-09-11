@@ -3,7 +3,6 @@ package com.example.accountrecovery
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -12,45 +11,34 @@ import androidx.appcompat.app.AppCompatActivity
 class AiHubConnectionsActivity : AppCompatActivity() {
     private lateinit var status: TextView
 
-    private val providers = listOf(
-        "📁 Files" to "เลือกไฟล์/โฟลเดอร์ด้วย Android Storage Access Framework",
-        "☁️ TeraBox" to "รอการเชื่อมต่อ Official API/SDK ที่ผู้ใช้อนุญาต",
-        "🐙 GitHub" to "รอการ Authorize repository ที่ผู้ใช้เลือก",
-        "🤖 Poe" to "รอ Sign in with Poe (OAuth + PKCE)",
-        "💬 ChatGPT" to "รอการตั้งค่า Official API/OAuth",
-        "✨ Gemini" to "รอการตั้งค่า Google Gemini API/OAuth"
-    )
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(24, 24, 24, 24)
         }
-        val title = TextView(this).apply {
+        root.addView(TextView(this).apply {
             text = "🔗 AI Hub / Connections"
             textSize = 28f
-        }
+        })
         status = TextView(this).apply {
-            text = "เลือกบริการเพื่อเชื่อมต่อแบบผู้ใช้อนุญาต"
+            text = "เลือกบริการเพื่อเชื่อมต่อแบบผู้ใช้อนุญาต — ไม่มีการคัดลอกข้อมูลลับอัตโนมัติ"
             textSize = 16f
             setPadding(0, 12, 0, 16)
         }
-        root.addView(title)
         root.addView(status)
 
-        providers.forEach { (name, description) ->
-            val button = Button(this).apply {
-                text = "$name\n$description"
-                setOnClickListener { connect(name) }
-            }
-            root.addView(button)
+        AiHubConnectionEndpoints.all.forEach { endpoint ->
+            root.addView(Button(this).apply {
+                text = "${endpoint.label}\n${endpoint.description}"
+                setOnClickListener { connect(endpoint) }
+            })
         }
         setContentView(root)
     }
 
-    private fun connect(name: String) {
-        if (name.contains("Files")) {
+    private fun connect(endpoint: AiHubConnectionEndpoint) {
+        if (endpoint.id == "files") {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
@@ -59,16 +47,26 @@ class AiHubConnectionsActivity : AppCompatActivity() {
             startActivityForResult(intent, REQUEST_TREE)
             return
         }
-        status.text = "$name: ยังไม่เชื่อมต่อ — ต้องทำ OAuth/API authorization ของบริการนี้ก่อน"
+        val url = endpoint.authorizationUrl
+        if (url != null) {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            status.text = "${endpoint.label}: เปิดหน้าการอนุญาต/ตั้งค่าแล้ว — กลับมาเชื่อมต่อหลังตั้งค่าอย่างเป็นทางการ"
+        } else {
+            status.text = "${endpoint.label}: ใช้งานผ่าน Android/เบราว์เซอร์ โดยแอปจะไม่อ่านข้อมูลส่วนตัวแบบลับ ๆ"
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_TREE && resultCode == RESULT_OK) {
-            data?.data?.let { uri: Uri ->
+            data?.data?.let { uri ->
                 val flags = data.flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                try { contentResolver.takePersistableUriPermission(uri, flags) } catch (_: SecurityException) { }
-                status.text = "📁 Files: เชื่อมต่อแล้ว — โฟลเดอร์ที่ผู้ใช้เลือกได้รับสิทธิ์"
+                try {
+                    contentResolver.takePersistableUriPermission(uri, flags)
+                    status.text = "📁 Files: เชื่อมต่อแล้ว — โฟลเดอร์ที่ผู้ใช้เลือกได้รับสิทธิ์ถาวรตาม Android SAF"
+                } catch (_: SecurityException) {
+                    status.text = "📁 Files: เลือกโฟลเดอร์แล้ว แต่ไม่สามารถบันทึกสิทธิ์ถาวรได้"
+                }
             }
         }
     }
