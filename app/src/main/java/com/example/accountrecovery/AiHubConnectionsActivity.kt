@@ -10,9 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 
 class AiHubConnectionsActivity : AppCompatActivity() {
     private lateinit var status: TextView
+    private lateinit var connectionState: AiHubConnectionState
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        connectionState = AiHubConnectionState(this)
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(24, 24, 24, 24)
@@ -30,11 +32,16 @@ class AiHubConnectionsActivity : AppCompatActivity() {
 
         AiHubConnectionEndpoints.all.forEach { endpoint ->
             root.addView(Button(this).apply {
-                text = "${endpoint.label}\n${endpoint.description}"
+                text = stateLabel(endpoint)
                 setOnClickListener { connect(endpoint) }
             })
         }
         setContentView(root)
+    }
+
+    private fun stateLabel(endpoint: AiHubConnectionEndpoint): String {
+        val state = if (connectionState.isConnected(endpoint.id)) "✅ Connected" else "⚪ Needs authorization/setup"
+        return "${endpoint.label}\n$state\n${endpoint.description}"
     }
 
     private fun connect(endpoint: AiHubConnectionEndpoint) {
@@ -50,9 +57,9 @@ class AiHubConnectionsActivity : AppCompatActivity() {
         val url = endpoint.authorizationUrl
         if (url != null) {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-            status.text = "${endpoint.label}: เปิดหน้าการอนุญาต/ตั้งค่าแล้ว — กลับมาเชื่อมต่อหลังตั้งค่าอย่างเป็นทางการ"
+            status.text = "${endpoint.label}: เปิดหน้าการอนุญาต/ตั้งค่าแล้ว — หลังอนุมัติให้กลับมาใช้งานในแอป"
         } else {
-            status.text = "${endpoint.label}: ใช้งานผ่าน Android/เบราว์เซอร์ โดยแอปจะไม่อ่านข้อมูลส่วนตัวแบบลับ ๆ"
+            status.text = "${endpoint.label}: ต้องตั้งค่าอย่างเป็นทางการก่อน แอปจะไม่อ่านข้อมูลส่วนตัวแบบลับ ๆ"
         }
     }
 
@@ -63,7 +70,8 @@ class AiHubConnectionsActivity : AppCompatActivity() {
                 val flags = data.flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                 try {
                     contentResolver.takePersistableUriPermission(uri, flags)
-                    status.text = "📁 Files: เชื่อมต่อแล้ว — โฟลเดอร์ที่ผู้ใช้เลือกได้รับสิทธิ์ถาวรตาม Android SAF"
+                    connectionState.markConnected("files")
+                    status.text = "📁 Files: เชื่อมต่อแล้ว — โฟลเดอร์ที่ผู้ใช้เลือกได้รับสิทธิ์ตาม Android SAF"
                 } catch (_: SecurityException) {
                     status.text = "📁 Files: เลือกโฟลเดอร์แล้ว แต่ไม่สามารถบันทึกสิทธิ์ถาวรได้"
                 }
