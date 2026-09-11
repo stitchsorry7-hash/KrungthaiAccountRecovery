@@ -16,10 +16,10 @@ object AiHubConnectionEndpoints {
         AiHubConnectionEndpoint("poe", "🤖 Poe", "Sign in with Poe OAuth + PKCE; client ID and redirect URI must be registered by the app owner.", "https://poe.com/api/clients"),
         AiHubConnectionEndpoint("chatgpt", "💬 ChatGPT / OpenAI", "Official API/OAuth configuration; credentials must be supplied by the user through a secure flow.", "https://platform.openai.com/"),
         AiHubConnectionEndpoint("gemini", "✨ Gemini / Google", "Official Gemini API/OAuth configuration; credentials must be supplied through a secure flow.", "https://ai.google.dev/"),
-        AiHubConnectionEndpoint("google", "🔎 Google", "Google account/API destinations are permission-scoped; no automatic account-data copying." , "https://console.cloud.google.com/"),
+        AiHubConnectionEndpoint("google", "🔎 Google", "Google account/API destinations are permission-scoped; no automatic account-data copying.", "https://console.cloud.google.com/"),
         AiHubConnectionEndpoint("gmail", "✉️ Gmail", "Gmail data requires Google OAuth scopes and explicit user consent.", "https://myaccount.google.com/connections"),
         AiHubConnectionEndpoint("chrome", "🌐 Chrome / Web", "Web navigation is delegated to Android/browser; the app does not silently read browser data."),
         AiHubConnectionEndpoint("krungthai", "🏦 Krungthai Open Banking", "Bank APIs require official partner registration, scopes, sandbox/contract approval and user authorization.", "https://developers.krungthai.com/"),
         AiHubConnectionEndpoint("ci", "⚙️ GitHub Actions / Build", "Build/test endpoint; CI can validate and produce APK artifacts when the repository workflow is configured.", "https://github.com/marketplace?type=actions")
-    ]
+    )
 }
