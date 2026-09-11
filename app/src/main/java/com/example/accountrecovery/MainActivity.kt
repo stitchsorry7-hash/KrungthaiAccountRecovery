@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(b: Bundle?) { super.onCreate(b); setContentView(R.layout.activity_main); ocr = OcrProcessor(this); secure = SecureStore(this)
         status=findViewById(R.id.status); results=findViewById(R.id.results)
+        findViewById<Button>(R.id.aiHubConnections).setOnClickListener { startActivity(Intent(this, AiHubConnectionsActivity::class.java)) }
         findViewById<Button>(R.id.selectFile).setOnClickListener { pick.launch(arrayOf("image/*", "application/pdf")) }
         findViewById<Button>(R.id.camera).setOnClickListener { if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED) camera.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE)) else permission.launch(Manifest.permission.CAMERA) }
         findViewById<Button>(R.id.clear).setOnClickListener { results.removeAllViews(); status.text="เลือกหลักฐานเพื่อเริ่มค้นหา" }
