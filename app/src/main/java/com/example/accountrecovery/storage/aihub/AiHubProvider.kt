@@ -25,3 +25,23 @@ class GitHubProvider : AiHubProvider {
     override suspend fun search(query: String) =
         AiHubSearchResult(source, emptyList(), "GitHub authorization/repository configuration required.")
 }
+
+interface AiModelProvider {
+    val id: String
+    suspend fun generate(input: String): String
+}
+
+class PoeProvider : AiModelProvider {
+    override val id = "poe"
+    override suspend fun generate(input: String) = "Poe API/OAuth configuration required."
+}
+
+class ChatGptProvider : AiModelProvider {
+    override val id = "chatgpt"
+    override suspend fun generate(input: String) = "OpenAI API/OAuth configuration required."
+}
+
+class GeminiProvider : AiModelProvider {
+    override val id = "gemini"
+    override suspend fun generate(input: String) = "Google Gemini API/OAuth configuration required."
+}
