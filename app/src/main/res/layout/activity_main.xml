@@ -1,6 +1,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent"><LinearLayout android:orientation="vertical" android:padding="20dp" android:layout_width="match_parent" android:layout_height="wrap_content">
 <TextView android:text="💳 กู้เลขบัญชี" android:textSize="28sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <TextView android:id="@+id/status" android:text="เลือกหลักฐานเพื่อเริ่มค้นหา" android:paddingTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Button android:id="@+id/aiHubConnections" android:text="🔗 AI Hub — Files → TeraBox → GitHub → Poe → ChatGPT → Gemini" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <Button android:id="@+id/selectFile" android:text="เลือกไฟล์ / รูป / PDF" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <Button android:id="@+id/camera" android:text="📷 สแกนด้วยกล้อง" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <TextView android:text="ผลการค้นหา" android:textStyle="bold" android:textSize="20sp" android:paddingTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
